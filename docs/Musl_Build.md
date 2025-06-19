@@ -65,3 +65,12 @@ cmake --build build -j$(nproc)
 ```
 
 This produces libraries linked against musl in the `build` directory.
+
+## 4. Automated builds
+
+The repository provides a GitHub Actions workflow
+[`musllinux.yml`](../.github/workflows/musllinux.yml) that automatically
+builds ONNX Runtime wheels for the `musllinux_1_1` policy whenever a pull
+request is opened. The workflow builds the musllinux Docker image and
+invokes `build.sh` in the container, publishing the wheel artifact for
+download.
