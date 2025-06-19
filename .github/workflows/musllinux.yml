@@ -13,9 +13,9 @@ jobs:
       - name: Build musllinux Docker image
         run: |
           git clone --depth 1 https://github.com/pypa/manylinux
-          docker build -t ort-musllinux \
-            --build-arg POLICY=musllinux_1_1 \
-            -f manylinux/docker/Dockerfile manylinux/docker
+          cd manylinux
+          POLICY=musllinux_1_2 PLATFORM=x86_64 COMMIT_SHA=latest ./build.sh
+          docker tag quay.io/pypa/musllinux_1_2_x86_64:latest ort-musllinux
 
       - name: Build wheel inside container
         run: |

@@ -1,6 +1,6 @@
 # Building ONNX Runtime musllinux wheels
 
-This document describes how to prepare a musl-based build environment for creating Python wheels compatible with the `musllinux_1_1` policy.
+This document describes how to prepare a musl-based build environment for creating Python wheels compatible with the `musllinux_1_2` policy.
 
 ## 1. Prepare the musllinux Docker image
 
@@ -16,11 +16,8 @@ ONNX Runtime uses the manylinux project to build portable Linux wheels, which no
 2. Build the Docker image with the musllinux policy:
 
    ```bash
-   python <ORT_ROOT>/tools/ci_build/get_docker_image.py \
-       --dockerfile docker/Dockerfile \
-       --context . \
-       --docker-build-args "--build-arg POLICY=musllinux_1_1" \
-       --repository ort-musllinux
+   POLICY=musllinux_1_2 PLATFORM=x86_64 COMMIT_SHA=latest ./build.sh
+   docker tag quay.io/pypa/musllinux_1_2_x86_64:latest ort-musllinux
    ```
 
 The resulting `ort-musllinux:latest` image contains the musl development packages required to build ONNX Runtime wheels.
@@ -40,7 +37,7 @@ The resulting `ort-musllinux:latest` image contains the musl development package
    ./build.sh --update --config Release --build --build_wheel --parallel
    ```
 
-   The wheel is created under `build/Linux/Release/dist/` and is compatible with `musllinux_1_1`.
+   The wheel is created under `build/Linux/Release/dist/` and is compatible with `musllinux_1_2`.
 
 ## 3. Cross-compiling with CMake
 
@@ -70,7 +67,7 @@ This produces libraries linked against musl in the `build` directory.
 
 The repository provides a GitHub Actions workflow
 [`musllinux.yml`](../.github/workflows/musllinux.yml) that automatically
-builds ONNX Runtime wheels for the `musllinux_1_1` policy whenever a pull
+builds ONNX Runtime wheels for the `musllinux_1_2` policy whenever a pull
 request is opened. The workflow builds the musllinux Docker image and
 invokes `build.sh` in the container, publishing the wheel artifact for
 download.
