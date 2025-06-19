@@ -20,9 +20,8 @@
   - ONNX Runtime Inferencing: [microsoft/onnxruntime-inference-examples](https://github.com/microsoft/onnxruntime-inference-examples)
   - ONNX Runtime Training: [microsoft/onnxruntime-training-examples](https://github.com/microsoft/onnxruntime-training-examples)
 * [Musllinux build instructions](docs/Musl_Build.md)
-  (requires [Docker](https://docs.docker.com/get-docker/) to be installed)
-* GitHub Actions workflow [`musllinux.yml`](.github/workflows/musllinux.yml) builds musllinux wheels automatically
-* Dockerfile for local musllinux build: [dockerfiles/Dockerfile.musllinux](dockerfiles/Dockerfile.musllinux)
+  * GitHub Actions workflow [`musllinux.yml`](.github/workflows/musllinux.yml) builds musllinux wheels automatically
+  * Dockerfile for local musllinux build: [dockerfiles/Dockerfile.musllinux](dockerfiles/Dockerfile.musllinux)
 
 ## Releases
 

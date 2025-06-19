@@ -4,7 +4,11 @@ This document describes how to prepare a musl-based build environment for creati
 
 ## Prerequisites
 
-You need Docker installed in order to build the musllinux image and run the container. On Ubuntu the package can be installed with:
+You can either build inside a Docker container or cross-compile directly using the musl toolchain.
+
+### Using Docker
+
+Install Docker if you want to build the musllinux image locally. On Ubuntu:
 
 ```bash
 sudo apt-get update
@@ -13,7 +17,14 @@ sudo apt-get install -y docker.io
 
 Alternatively run `tools/install_docker.sh` from this repository.
 
-After installation ensure the daemon is running and that your user has permission to invoke `docker`.
+### Using a native musl toolchain
+
+Install the musl compiler wrappers when building without Docker:
+
+```bash
+sudo apt-get update
+sudo apt-get install musl-tools musl-dev
+```
 
 ## 1. Prepare the musllinux Docker image
 
@@ -92,6 +103,7 @@ This produces libraries linked against musl in the `build` directory.
 The repository provides a GitHub Actions workflow
 [`musllinux.yml`](../.github/workflows/musllinux.yml) that automatically
 builds ONNX Runtime wheels for the `musllinux_1_2` policy whenever a pull
-request is opened. The workflow builds the musllinux Docker image and
-invokes `build.sh` in the container, publishing the wheel artifact for
-download.
+request is opened. The workflow installs the musl toolchain on the runner,
+invokes `build.sh` directly using the
+`cmake/linux_x86_64_musl_toolchain.cmake` file,
+and uploads the resulting wheel as an artifact.
