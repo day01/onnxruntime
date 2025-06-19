@@ -39,7 +39,18 @@ The resulting `ort-musllinux:latest` image contains the musl development package
 
    The wheel is created under `build/Linux/Release/dist/` and is compatible with `musllinux_1_2`.
 
-## 3. Cross-compiling with CMake
+## 3. Build with the included Dockerfile
+
+The `dockerfiles` directory provides a `Dockerfile.musllinux` that replicates the GitHub Actions workflow. Build the wheel locally with:
+
+```bash
+docker build -f dockerfiles/Dockerfile.musllinux -t ort-musllinux .
+```
+
+The wheel is saved under `/dist` in the resulting image.
+
+
+## 4. Cross-compiling with CMake
 
 You can also build outside of Docker using a toolchain file if you have a musl
 toolchain installed. On Ubuntu the basic tools can be installed with
@@ -63,7 +74,7 @@ cmake --build build -j$(nproc)
 
 This produces libraries linked against musl in the `build` directory.
 
-## 4. Automated builds
+## 5. Automated builds
 
 The repository provides a GitHub Actions workflow
 [`musllinux.yml`](../.github/workflows/musllinux.yml) that automatically

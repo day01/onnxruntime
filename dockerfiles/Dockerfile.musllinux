@@ -1,0 +1,15 @@
+# --------------------------------------------------------------
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+# --------------------------------------------------------------
+# Dockerfile to build ONNX Runtime musllinux wheel
+
+FROM quay.io/pypa/musllinux_1_2_x86_64:latest AS build
+
+WORKDIR /workspace
+COPY . /workspace
+
+RUN bash ./build.sh --update --config Release --build --build_wheel --parallel
+
+FROM scratch AS artifact
+COPY --from=build /workspace/build/Linux/Release/dist /dist
