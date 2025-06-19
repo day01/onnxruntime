@@ -2,6 +2,19 @@
 
 This document describes how to prepare a musl-based build environment for creating Python wheels compatible with the `musllinux_1_2` policy.
 
+## Prerequisites
+
+You need Docker installed in order to build the musllinux image and run the container. On Ubuntu the package can be installed with:
+
+```bash
+sudo apt-get update
+sudo apt-get install -y docker.io
+```
+
+Alternatively run `tools/install_docker.sh` from this repository.
+
+After installation ensure the daemon is running and that your user has permission to invoke `docker`.
+
 ## 1. Prepare the musllinux Docker image
 
 ONNX Runtime uses the manylinux project to build portable Linux wheels, which now natively support the musllinux policy.
