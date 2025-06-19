@@ -15,7 +15,7 @@ jobs:
           git clone --depth 1 https://github.com/pypa/manylinux
           docker build -t ort-musllinux \
             --build-arg POLICY=musllinux_1_1 \
-            -f manylinux/docker/Dockerfile manylinux
+            -f manylinux/docker/Dockerfile manylinux/docker
 
       - name: Build wheel inside container
         run: |
