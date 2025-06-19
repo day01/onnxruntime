@@ -4,24 +4,16 @@ This document describes how to prepare a musl-based build environment for creati
 
 ## 1. Prepare the musllinux Docker image
 
-ONNX Runtime uses the manylinux project to build portable Linux wheels. The repository provides a patch that adds musl support in `tools/ci_build/github/linux/docker/manylinux.patch`.
+ONNX Runtime uses the manylinux project to build portable Linux wheels, which now natively support the musllinux policy.
 
 1. Clone the manylinux repository and change into its directory:
 
    ```bash
-   git clone https://github.com/pypa/manylinux
+   git clone --depth 1 https://github.com/pypa/manylinux
    cd manylinux
    ```
 
-2. Apply the ONNX Runtime patch:
-
-   ```bash
-   python <ORT_ROOT>/tools/ci_build/patch_manylinux.py --dockerfile docker/Dockerfile --context .
-   ```
-
-   Replace `<ORT_ROOT>` with the path to your ONNX Runtime source tree.
-
-3. Build the Docker image with the musllinux policy:
+2. Build the Docker image with the musllinux policy:
 
    ```bash
    python <ORT_ROOT>/tools/ci_build/get_docker_image.py \
