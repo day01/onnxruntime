@@ -1,0 +1,11 @@
+#This file is just a sample. You may need to modify it before using.
+# Sample toolchain file for cross-compiling ONNX Runtime for x86_64 musl
+SET(CMAKE_SYSTEM_NAME Linux)
+SET(CMAKE_SYSTEM_VERSION 1)
+SET(CMAKE_C_COMPILER x86_64-linux-musl-gcc)
+SET(CMAKE_CXX_COMPILER x86_64-linux-musl-g++)
+SET(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+SET(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+SET(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+SET(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
+

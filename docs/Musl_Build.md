@@ -1,0 +1,75 @@
+# Building ONNX Runtime musllinux wheels
+
+This document describes how to prepare a musl-based build environment for creating Python wheels compatible with the `musllinux_1_1` policy.
+
+## 1. Prepare the musllinux Docker image
+
+ONNX Runtime uses the manylinux project to build portable Linux wheels. The repository provides a patch that adds musl support in `tools/ci_build/github/linux/docker/manylinux.patch`.
+
+1. Clone the manylinux repository and change into its directory:
+
+   ```bash
+   git clone https://github.com/pypa/manylinux
+   cd manylinux
+   ```
+
+2. Apply the ONNX Runtime patch:
+
+   ```bash
+   python <ORT_ROOT>/tools/ci_build/patch_manylinux.py --dockerfile docker/Dockerfile --context .
+   ```
+
+   Replace `<ORT_ROOT>` with the path to your ONNX Runtime source tree.
+
+3. Build the Docker image with the musllinux policy:
+
+   ```bash
+   python <ORT_ROOT>/tools/ci_build/get_docker_image.py \
+       --dockerfile docker/Dockerfile \
+       --context . \
+       --docker-build-args "--build-arg POLICY=musllinux_1_1" \
+       --repository ort-musllinux
+   ```
+
+The resulting `ort-musllinux:latest` image contains the musl development packages required to build ONNX Runtime wheels.
+
+## 2. Build ONNX Runtime inside the container
+
+1. Start a container from the musllinux image and mount the source tree:
+
+   ```bash
+   docker run --rm -it -v <ORT_ROOT>:/workspace ort-musllinux bash
+   ```
+
+2. In the container build the wheel:
+
+   ```bash
+   cd /workspace
+   ./build.sh --update --config Release --build --build_wheel --parallel
+   ```
+
+   The wheel is created under `build/Linux/Release/dist/` and is compatible with `musllinux_1_1`.
+
+## 3. Cross-compiling with CMake
+
+You can also build outside of Docker using a toolchain file if you have a musl
+toolchain installed. On Ubuntu the basic tools can be installed with
+
+```bash
+sudo apt-get install musl-tools musl-dev
+```
+
+For full C++ support you will need a cross `g++` compiler (for example from the
+`musl-cross-make` project) so that `x86_64-linux-musl-g++` is available.
+
+The repository
+includes `cmake/linux_x86_64_musl_toolchain.cmake` which configures CMake for a
+musl-based target:
+
+```bash
+cmake -DCMAKE_TOOLCHAIN_FILE=cmake/linux_x86_64_musl_toolchain.cmake \
+      -DCMAKE_BUILD_TYPE=Release -B build
+cmake --build build -j$(nproc)
+```
+
+This produces libraries linked against musl in the `build` directory.

@@ -1,0 +1,38 @@
+name: Musllinux Build
+
+on:
+  pull_request:
+    branches: [main, 'rel-*']
+
+jobs:
+  build-musllinux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Prepare musllinux Docker image
+        run: |
+          git clone https://github.com/pypa/manylinux
+          python tools/ci_build/patch_manylinux.py --dockerfile manylinux/docker/Dockerfile --context manylinux
+          python tools/ci_build/get_docker_image.py \
+            --dockerfile manylinux/docker/Dockerfile \
+            --context manylinux \
+            --docker-build-args "--build-arg POLICY=musllinux_1_1" \
+            --repository ort-musllinux
+
+      - name: Build wheel inside container
+        run: |
+          docker run --rm -v "${{ github.workspace }}:/workspace" ort-musllinux:latest bash -c "cd /workspace && ./build.sh --update --config Release --build --build_wheel --skip_tests --parallel"
+
+      - name: Upload wheel artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: musllinux-wheel
+          path: build/Linux/Release/dist/*.whl
+          if-no-files-found: error
