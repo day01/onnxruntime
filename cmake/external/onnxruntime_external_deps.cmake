@@ -182,10 +182,9 @@ endif()
 #   for cross-compiling
 #2. if ONNX_CUSTOM_PROTOC_EXECUTABLE is not set, Compile everything(including protoc) from source code.
 if(Patch_FOUND)
-  set(ONNXRUNTIME_PROTOBUF_PATCH_COMMAND ${Patch_EXECUTABLE} --binary --ignore-whitespace -p1 < ${PROJECT_SOURCE_DIR}/patches/protobuf/protobuf_cmake.patch &&
-                                         ${Patch_EXECUTABLE} --binary --ignore-whitespace -p1 < ${PROJECT_SOURCE_DIR}/patches/protobuf/protobuf_android_log.patch)
+  set(ONNXRUNTIME_FLATBUFFERS_PATCH_COMMAND ${Patch_EXECUTABLE} --binary --ignore-whitespace -p1 < ${PROJECT_SOURCE_DIR}/patches/flatbuffers/flatbuffers.patch)
 else()
- set(ONNXRUNTIME_PROTOBUF_PATCH_COMMAND "")
+  set(ONNXRUNTIME_FLATBUFFERS_PATCH_COMMAND "")
 endif()
 
 #Protobuf depends on absl and utf8_range
@@ -193,7 +192,7 @@ onnxruntime_fetchcontent_declare(
   Protobuf
   URL ${DEP_URL_protobuf}
   URL_HASH SHA1=${DEP_SHA1_protobuf}
-  PATCH_COMMAND ${ONNXRUNTIME_PROTOBUF_PATCH_COMMAND}
+  PATCH_COMMAND ${ONNXRUNTIME_FLATBUFFERS_PATCH_COMMAND}
   EXCLUDE_FROM_ALL
   FIND_PACKAGE_ARGS NAMES Protobuf protobuf
 )
@@ -448,11 +447,6 @@ set(FLATBUFFERS_BUILD_TESTS OFF CACHE BOOL "FLATBUFFERS_BUILD_TESTS" FORCE)
 set(FLATBUFFERS_INSTALL ON CACHE BOOL "FLATBUFFERS_INSTALL" FORCE)
 set(FLATBUFFERS_BUILD_FLATHASH OFF CACHE BOOL "FLATBUFFERS_BUILD_FLATHASH" FORCE)
 set(FLATBUFFERS_BUILD_FLATLIB ON CACHE BOOL "FLATBUFFERS_BUILD_FLATLIB" FORCE)
-if(Patch_FOUND)
-  set(ONNXRUNTIME_FLATBUFFERS_PATCH_COMMAND ${Patch_EXECUTABLE} --binary --ignore-whitespace -p1 < ${PROJECT_SOURCE_DIR}/patches/flatbuffers/flatbuffers.patch)
-else()
- set(ONNXRUNTIME_FLATBUFFERS_PATCH_COMMAND "")
-endif()
 
 #flatbuffers 1.11.0 does not have flatbuffers::IsOutRange, therefore we require 1.12.0+
 onnxruntime_fetchcontent_declare(
@@ -489,6 +483,14 @@ namespace std { using ::getenv; }
       target_compile_options(flatc PRIVATE /FI${CMAKE_BINARY_DIR}/gdk_cstdlib_wrapper.h)
     endif()
   endif()
+endif()
+
+# Fix util.h for musl: override locale-specific macro definitions for musl compatibility
+if(flatbuffers_SOURCE_DIR)
+  file(READ "${flatbuffers_SOURCE_DIR}/include/flatbuffers/util.h" FB_UTIL_CONTENTS)
+  string(REPLACE "#define __strtoull_impl(s, pe, b) strtoull_l(s, pe, b, ClassicLocale::Get())" "#define __strtoull_impl(s, pe, b) strtoull(s, pe, b)" FB_UTIL_CONTENTS "${FB_UTIL_CONTENTS}")
+  string(REPLACE "#define __strtoll_impl(s, pe, b) strtoll_l(s, pe, b, ClassicLocale::Get())" "#define __strtoll_impl(s, pe, b) strtoll(s, pe, b)" FB_UTIL_CONTENTS "${FB_UTIL_CONTENTS}")
+  file(WRITE "${flatbuffers_SOURCE_DIR}/include/flatbuffers/util.h" "${FB_UTIL_CONTENTS}")
 endif()
 endif()
 

@@ -7,7 +7,7 @@ index 3987eac9..5e5462f1 100644
  if(DEFINED FLATBUFFERS_CXX_FLAGS)
    message(STATUS "extend CXX_FLAGS with ${FLATBUFFERS_CXX_FLAGS}")
 -  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${FLATBUFFERS_CXX_FLAGS}")
-+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${FLATBUFFERS_CXX_FLAGS} -Wno-error=stringop-overflow")
++  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${FLATBUFFERS_CXX_FLAGS} -Wno-error=stringop-overflow -Dstrtoll_l=strtoll -Dstrtoull_l=strtoull")
  endif()
  message(STATUS "CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
 diff --git a/include/flatbuffers/flatbuffers.h b/include/flatbuffers/flatbuffers.h
